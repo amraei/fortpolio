@@ -28,6 +28,7 @@ export default {
     "~plugins/bootstrap-icons",
     "~plugins/db",
     "~plugins/cgc",
+    "~plugins/moment",
     "~plugins/filters"
   ],
 

@@ -22,13 +22,15 @@ export default ({ store }, inject) => {
       return funds;
     },
 
-    async addFund(amount) {
+    async addFund(amount, date) {
       amount = parseFloat(amount);
+
+      if (!date) date = moment().format("YYYY-MM-DD hh:mm:ss");
 
       const funds = await this.getFunds();
 
       funds.records.push({
-        created_at: moment().format("YYYY-MM-DD hh:mm:ss"),
+        created_at: date,
         amount
       });
 
@@ -56,9 +58,11 @@ export default ({ store }, inject) => {
       return assets;
     },
 
-    async addTrans(coin, quantity, price) {
+    async addTrans(coin, quantity, price, date) {
       quantity = parseFloat(quantity);
       price = parseFloat(price);
+
+      if (!date) date = moment().format("YYYY-MM-DD hh:mm:ss");
 
       const assets = await this.getAssets();
 
@@ -72,7 +76,7 @@ export default ({ store }, inject) => {
       };
 
       newCoin.records.push({
-        created_at: moment().format("YYYY-MM-DD hh:mm:ss"),
+        created_at: date,
         quantity,
         price
       });
@@ -91,6 +95,8 @@ export default ({ store }, inject) => {
         ...assets,
         _id: "assets"
       });
+
+      this.addFund(-(quantity * price), date);
 
       store.commit("setAssets", assets);
     }

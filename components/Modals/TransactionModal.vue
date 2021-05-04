@@ -3,10 +3,10 @@
     id="transaction-modal"
     title="Add new transaction"
     hide-footer
-    @hidden="reset"
+    @show="intial"
   >
     <div class="modal-body">
-      <form @submit.prevent="add">
+      <form v-show="!view" novalidate @submit.prevent="add">
         <div class="form-group">
           <coin-selector v-model="coin" />
         </div>
@@ -20,6 +20,7 @@
               <input
                 v-model="quantity"
                 type="number"
+                step="0.01"
                 class="form-control"
                 placeholder="0.00"
               />
@@ -31,7 +32,7 @@
                 <input
                   v-model="price"
                   type="number"
-                  step="0.01"
+                  step="0.000001"
                   class="form-control pl-4"
                   placeholder="0.00"
                 />
@@ -39,12 +40,43 @@
             </div>
           </div>
         </div>
+        <div class="form-group">
+          <button
+            class="btn btn-sm btn-light"
+            type="button"
+            @click="view = 'date'"
+          >
+            <strong>
+              <b-icon-calendar class="mr-1" />
+              {{ $moment(datetime).format("MMMM DD, YYYY, hh:mm A") }}
+            </strong>
+          </button>
+        </div>
+
         <button
           type="submit"
           class="btn btn-primary btn-block mt-5"
         >
           Add transaction
         </button>
+      </form>
+
+      <form v-show="view === 'date'" @submit.prevent="setDatetime">
+        <div class="form-group">
+          <b-calendar v-model="selectedDate" locale="en-US" block></b-calendar>
+        </div>
+        <div class="form-group text-center">
+          <b-time v-model="selectedTime" locale="en" block></b-time>
+        </div>
+
+        <div class="d-flex mt-5">
+          <button class="btn btn-light mr-3" type="button" @click="view = null">
+            <b-icon-arrow-left-short />
+          </button>
+          <button type="submit" class="btn btn-primary flex-grow-1">
+            Set date & time
+          </button>
+        </div>
       </form>
     </div>
   </b-modal>
@@ -59,10 +91,14 @@ export default {
 
   data() {
     return {
+      view: null,
       type: null,
       coin: null,
       quantity: null,
-      price: null
+      price: null,
+      datetime: null,
+      selectedDate: null,
+      selectedTime: null
     };
   },
 
@@ -74,15 +110,24 @@ export default {
     add() {
       const quantity = this.quantity * (this.type === "buy" ? 1 : -1);
 
-      this.$db.addTrans(this.coin, quantity, this.price);
+      this.$db.addTrans(this.coin, quantity, this.price, this.datetime);
       this.$bvModal.hide("transaction-modal");
     },
 
-    reset() {
-      this.type = null;
+    setDatetime() {
+      this.datetime = this.selectedDate + " " + this.selectedTime;
+      this.view = null;
+    },
+
+    intial() {
+      this.type = "buy";
       this.coin = null;
       this.quantity = null;
       this.price = null;
+      this.selectedDate = this.$moment().format("YYYY-MM-DD");
+      this.selectedTime = this.$moment().format("HH:mm");
+
+      this.setDatetime();
     }
   }
 };

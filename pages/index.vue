@@ -36,7 +36,10 @@
           </div>
         </div>
         <div>
-          <table class="table table-striped table-hover mb-0">
+          <table
+            v-if="Object.keys(assets.list).length"
+            class="table table-striped table-hover mb-0"
+          >
             <thead>
               <tr class="small">
                 <th>Name</th>
@@ -114,6 +117,11 @@
               </template>
             </tbody>
           </table>
+
+          <div v-else class="text-center py-5 rounded">
+            <h4>Your portfolio is empty!</h4>
+            <p class="text-muted">Please add some transactions.</p>
+          </div>
         </div>
       </div>
     </div>
@@ -163,7 +171,7 @@ export default {
       handler(assets) {
         clearTimeout(this.$options.timeout);
 
-        if (assets.list.length) this.syncMarket();
+        if (Object.keys(assets.list).length) this.syncMarket();
       }
     }
   },

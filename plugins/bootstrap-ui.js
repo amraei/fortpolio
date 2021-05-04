@@ -4,11 +4,19 @@
  * building robust, powerful web applications using Vue and Laravel.
  */
 import Vue from "vue";
-// import 'bootstrap-vue/dist/bootstrap-vue.css'
+import 'bootstrap-vue/dist/bootstrap-vue.css'
 
-import { BFormRadioGroup, BModal, ModalPlugin } from "bootstrap-vue";
+import {
+  BCalendar,
+  BFormRadioGroup,
+  BModal,
+  BTime,
+  ModalPlugin
+} from "bootstrap-vue";
 
+Vue.component("BCalendar", BCalendar);
 Vue.component("BFormRadioGroup", BFormRadioGroup);
 Vue.component("BModal", BModal);
+Vue.component("BTime", BTime);
 
 Vue.use(ModalPlugin);

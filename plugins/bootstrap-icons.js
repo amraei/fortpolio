@@ -6,12 +6,16 @@
 import Vue from "vue";
 
 import {
+  BIconArrowLeftShort,
+  BIconCalendar,
   BIconCaretDownFill,
   BIconCaretUpFill,
   BIconCash,
   BIconPlus
 } from "bootstrap-vue";
 
+Vue.component("BIconArrowLeftShort", BIconArrowLeftShort);
+Vue.component("BIconCalendar", BIconCalendar);
 Vue.component("BIconCaretUpFill", BIconCaretUpFill);
 Vue.component("BIconCaretDownFill", BIconCaretDownFill);
 Vue.component("BIconCash", BIconCash);
