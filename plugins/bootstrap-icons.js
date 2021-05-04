@@ -5,7 +5,14 @@
  */
 import Vue from "vue";
 
-import { BIconCash, BIconPlus } from "bootstrap-vue";
+import {
+  BIconCaretDownFill,
+  BIconCaretUpFill,
+  BIconCash,
+  BIconPlus
+} from "bootstrap-vue";
 
+Vue.component("BIconCaretUpFill", BIconCaretUpFill);
+Vue.component("BIconCaretDownFill", BIconCaretDownFill);
 Vue.component("BIconCash", BIconCash);
 Vue.component("BIconPlus", BIconPlus);

@@ -44,39 +44,74 @@
                 <th>24H</th>
                 <th class="text-right">Holdings</th>
                 <th class="text-right">Profit/Loss</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="coin in assets.list" :key="`coin-${coin.id}`">
-                <td class="py-4">
-                  <strong>{{ coin.name }}</strong>
-                  <small class="text-muted">
-                    {{ coin.symbol.toUpperCase() }}
-                  </small>
-                </td>
-                <td class="py-4">
-                  <span v-if="marketData[coin.id]">
-                    {{ marketData[coin.id].usd | usd }}
-                  </span>
-                </td>
-                <td class="py-4">
-                  <span v-if="marketData[coin.id]">
-                    {{ marketData[coin.id].usd_24h_change.toFixed(2) }}%
-                  </span>
-                </td>
-                <td class="py-4 text-right">
-                  <div v-if="marketData[coin.id]">
-                    {{ (coin.total * marketData[coin.id].usd) | usd }}
-                  </div>
-                  {{ coin.total }}
-                  <small class="text-muted ml2">
-                    {{ coin.symbol.toUpperCase() }}
-                  </small>
-                </td>
-                <td class="py-4 text-right">
-                  {{ 114 | usd }}
-                </td>
-              </tr>
+              <template v-for="coin in assets.list">
+                <tr
+                  v-if="market[coin.id]"
+                  :key="`coin-${coin.id}`"
+                  :set="(calcs = getCalcs(coin.id))"
+                >
+                  <td class="py-4 align-middle">
+                    <strong>{{ coin.name }}</strong>
+                    <small class="text-muted">
+                      {{ coin.symbol.toUpperCase() }}
+                    </small>
+                  </td>
+                  <td class="py-4 align-middle">
+                    <span>
+                      {{ market[coin.id].usd | usd }}
+                    </span>
+                  </td>
+                  <td
+                    :class="[
+                      'py-4 align-middle',
+                      { 'text-success': market[coin.id].usd_24h_change >= 0 },
+                      { 'text-danger': market[coin.id].usd_24h_change < 0 }
+                    ]"
+                  >
+                    <b-icon-caret-up-fill
+                      v-if="market[coin.id].usd_24h_change > 0"
+                    />
+                    <b-icon-caret-down-fill
+                      v-if="market[coin.id].usd_24h_change < 0"
+                    />
+                    <span>
+                      {{ Math.abs(market[coin.id].usd_24h_change).toFixed(2) }}%
+                    </span>
+                  </td>
+                  <td class="py-4 align-middle text-right">
+                    <div>
+                      {{ coin.total }}
+                      <span class="text-muted ml2">
+                        {{ coin.symbol.toUpperCase() }}
+                      </span>
+                    </div>
+                    <div class="small">
+                      {{ calcs.valueUSD | usd }}
+                    </div>
+                  </td>
+                  <td class="py-4 align-middle text-right">
+                    <div>
+                      {{ calcs.pnlUSD > 0 ? "+" : "" }}{{ calcs.pnlUSD | usd }}
+                    </div>
+                    <div
+                      :class="[
+                        'small',
+                        { 'text-success': calcs.pnlUSDChange >= 0 },
+                        { 'text-danger': calcs.pnlUSDChange < 0 }
+                      ]"
+                    >
+                      <b-icon-caret-up-fill v-if="calcs.pnlUSDChange > 0" />
+                      <b-icon-caret-down-fill v-if="calcs.pnlUSDChange < 0" />
+                      {{ Math.abs(calcs.pnlUSDChange).toFixed(2) }}%
+                    </div>
+                  </td>
+                  <td></td>
+                </tr>
+              </template>
             </tbody>
           </table>
         </div>
@@ -114,7 +149,7 @@ export default {
   data() {
     return {
       coins,
-      marketData: {}
+      market: {}
     };
   },
 
@@ -122,15 +157,17 @@ export default {
     ...mapState(["funds", "assets"])
   },
 
-  // watch: {
-  //   assets: {
-  //     deep: true,
-  //     handler(assets) {
-  //       if (assets.list.length) this.syncPrices();
-  //       else clearTimeout(this.$options.timeout);
-  //     }
-  //   }
-  // },
+  watch: {
+    assets: {
+      deep: true,
+      handler(assets) {
+        clearTimeout(this.$options.timeout);
+
+        if (assets.list.length) this.syncPrices();
+      }
+    }
+  },
+
   mounted() {
     this.syncPrices();
   },
@@ -147,9 +184,24 @@ export default {
         include_24hr_change: true
       });
 
-      this.marketData = data.data;
+      this.market = data.data;
 
       this.$options.timeout = setTimeout(this.syncPrices, 10000);
+    },
+
+    getCalcs(id) {
+      const coin = this.assets.list[id];
+
+      const orderUSD = coin.total * coin.avgPrice;
+      const valueUSD = coin.total * this.market[coin.id].usd;
+
+      const pnlUSD = valueUSD - orderUSD;
+
+      return {
+        valueUSD,
+        pnlUSD,
+        pnlUSDChange: (valueUSD / orderUSD - 1) * 100
+      };
     }
   }
 };
