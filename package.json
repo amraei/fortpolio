@@ -12,8 +12,14 @@
   },
   "dependencies": {
     "@nuxtjs/axios": "^5.13.1",
+    "bootstrap-vue": "^2.21.2",
+    "coingecko-api": "^1.0.10",
     "core-js": "^3.9.1",
-    "nuxt": "^2.15.3"
+    "moment": "^2.29.1",
+    "nuxt": "^2.15.3",
+    "pouchdb-browser": "^7.2.2",
+    "request-promise": "^4.2.6",
+    "vue-bootstrap-typeahead": "^0.2.6"
   },
   "devDependencies": {
     "@nuxtjs/eslint-config": "^6.0.0",
@@ -21,6 +27,8 @@
     "babel-eslint": "^10.1.0",
     "eslint": "^7.22.0",
     "eslint-plugin-nuxt": "^2.0.0",
-    "eslint-plugin-vue": "^7.7.0"
+    "eslint-plugin-vue": "^7.7.0",
+    "node-sass": "^4.14.1",
+    "sass-loader": "^8.0.2"
   }
 }
