@@ -163,13 +163,13 @@ export default {
       handler(assets) {
         clearTimeout(this.$options.timeout);
 
-        if (assets.list.length) this.syncPrices();
+        if (assets.list.length) this.syncMarket();
       }
     }
   },
 
   mounted() {
-    this.syncPrices();
+    this.syncMarket();
   },
 
   destroyed() {
@@ -177,7 +177,7 @@ export default {
   },
 
   methods: {
-    async syncPrices() {
+    async syncMarket() {
       const tokens = Object.keys(this.assets.list);
 
       if (tokens.length) {
@@ -189,7 +189,7 @@ export default {
 
         this.market = data.data;
 
-        this.$options.timeout = setTimeout(this.syncPrices, 10000);
+        this.$options.timeout = setTimeout(this.syncMarket, 10000);
       }
     },
 
