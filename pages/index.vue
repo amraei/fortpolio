@@ -31,8 +31,8 @@
           <h4 class="mb-0">Your assets</h4>
 
           <div class="text-right">
-            <div>Capital (approximate):</div>
-            <h4 class="mb-0">{{ funds.amount | usd }}</h4>
+            <div class="text-muted">Capital (approximate):</div>
+            <h4 class="mb-0">{{ capital | usd }}</h4>
           </div>
         </div>
         <div>
@@ -43,8 +43,8 @@
             <thead>
               <tr class="small">
                 <th>Name</th>
-                <th>Price</th>
-                <th>24H</th>
+                <th class="text-right">Price</th>
+                <th class="text-right">24H</th>
                 <th class="text-right">Holdings</th>
                 <th class="text-right">Profit/Loss</th>
                 <th></th>
@@ -63,14 +63,14 @@
                       {{ coin.symbol.toUpperCase() }}
                     </small>
                   </td>
-                  <td class="py-4 align-middle">
+                  <td class="py-4 align-middle text-right">
                     <span>
                       {{ market[coin.id].usd | usd }}
                     </span>
                   </td>
                   <td
                     :class="[
-                      'py-4 align-middle',
+                      'py-4 align-middle text-right',
                       { 'text-success': market[coin.id].usd_24h_change >= 0 },
                       { 'text-danger': market[coin.id].usd_24h_change < 0 }
                     ]"
@@ -87,10 +87,10 @@
                   </td>
                   <td class="py-4 align-middle text-right">
                     <div>
-                      {{ coin.total }}
                       <span class="text-muted ml2">
                         {{ coin.symbol.toUpperCase() }}
                       </span>
+                      {{ coin.total }}
                     </div>
                     <div class="small">
                       {{ calcs.valueUSD | usd }}
@@ -98,7 +98,8 @@
                   </td>
                   <td class="py-4 align-middle text-right">
                     <div>
-                      {{ calcs.pnlUSD > 0 ? "+" : "" }}{{ calcs.pnlUSD | usd }}
+                      {{ calcs.pnlUSD > 0 ? "+" : ""
+                      }}{{ calcs.pnlUSD.toFixed(2) | usd }}
                     </div>
                     <div
                       :class="[
@@ -162,7 +163,19 @@ export default {
   },
 
   computed: {
-    ...mapState(["funds", "assets"])
+    ...mapState(["funds", "assets"]),
+
+    capital() {
+      return (
+        this.funds.amount +
+        Object.values(this.assets.list).reduce((total, asset) => {
+          if (this.market[asset.id])
+            return total + asset.total * this.market[asset.id].usd;
+
+          return total;
+        }, 0)
+      );
+    }
   },
 
   watch: {
