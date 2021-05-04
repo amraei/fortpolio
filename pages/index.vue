@@ -1,7 +1,7 @@
 <template>
   <div
     :class="[
-      'container-fluid my-4 flex-grow-1',
+      'container my-4 flex-grow-1',
       { 'd-flex flex-column justify-content-center': !funds.records.length }
     ]"
   >
