@@ -141,15 +141,19 @@ export default {
 
   methods: {
     async syncPrices() {
-      const data = await this.$cgc.simple.price({
-        ids: Object.keys(this.assets.list),
-        vs_currencies: ["usd"],
-        include_24hr_change: true
-      });
-
-      this.marketData = data.data;
-
-      this.$options.timeout = setTimeout(this.syncPrices, 10000);
+      const tokens = Object.keys(this.assets.list);
+      
+      if (tokens.length) {
+        const data = await this.$cgc.simple.price({
+          ids: tokens,
+          vs_currencies: ["usd"],
+          include_24hr_change: true
+        });
+  
+        this.marketData = data.data;
+  
+        this.$options.timeout = setTimeout(this.syncPrices, 10000);
+      }
     }
   }
 };
