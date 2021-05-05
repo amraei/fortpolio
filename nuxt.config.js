@@ -47,6 +47,10 @@ export default {
     "@nuxtjs/axios"
   ],
 
+  router: {
+    base: '/fortpolio/'
+  },
+
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {},
 
