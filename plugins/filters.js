@@ -7,5 +7,5 @@ Vue.filter("usd", value => {
     minimumFractionDigits: 6
   });
 
-  return dollarUS.format(value).replace(/0+$/, '');
+  return dollarUS.format(value).replace(/\.?0+$/, '');
 });

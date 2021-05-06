@@ -6,12 +6,14 @@
     ]"
   >
     <div v-if="funds.records.length" class="d-flex flex-column">
-      <div class="d-flex justify-content-between align-items-center">
-        <div>
+      <div class="row justify-content-between align-items-center">
+        <div class="col-md-6">
           <h3 class="mb-0">Your Portfolio</h3>
           <h6 class="text-muted">Track your crypto assets.</h6>
         </div>
-        <div class="d-flex align-items-center">
+        <div
+          class="mt-4 mt-md-0 col-md-6 d-flex align-items-center justify-content-md-end"
+        >
           <button v-b-modal.refuel-modal class="btn btn-link mr-3">
             <b-icon-cash class="mr-2" />
             Manage Funds
@@ -19,19 +21,21 @@
 
           <button v-b-modal.transaction-modal class="btn btn-primary">
             <b-icon-plus class="mr-2" />
-            Add Transaction
+            Add Asset
           </button>
         </div>
       </div>
 
       <div class="rounded border mt-5">
         <div
-          class="px-4 py-3 d-flex justify-content-between align-items-center"
+          class="px-2 py-3 d-flex justify-content-between align-items-center"
         >
           <h4 class="mb-0">Your assets</h4>
 
           <div class="text-right">
-            <div class="text-muted">Capital (approximate):</div>
+            <div class="text-muted">
+              Capital<span class="d-none d-md-inline"> (approximate)</span>:
+            </div>
             <h4 class="mb-0">{{ capital.toFixed(2) | usd }}</h4>
           </div>
         </div>
@@ -44,10 +48,10 @@
               <tr class="small">
                 <th>Name</th>
                 <th class="text-right">Price</th>
-                <th class="text-right">24H</th>
-                <th class="text-right">Holdings</th>
+                <th class="text-right d-none d-md-table-cell">24hr Change</th>
+                <th class="text-right d-none d-md-table-cell">Holdings</th>
                 <th class="text-right">Profit/Loss</th>
-                <th></th>
+                <!-- <th></th> -->
               </tr>
             </thead>
             <tbody>
@@ -58,19 +62,39 @@
                   :set="(calcs = getCalcs(coin.id))"
                 >
                   <td class="py-4 align-middle">
-                    <strong>{{ coin.name }}</strong>
-                    <small class="text-muted">
+                    <strong class="d-block d-md-inline">{{ coin.name }}</strong>
+                    <small class="text-muted d-block d-md-inline">
                       {{ coin.symbol.toUpperCase() }}
                     </small>
+                    <small class="d-block d-md-none">{{ coin.total }}</small>
                   </td>
                   <td class="py-4 align-middle text-right">
-                    <span>
+                    <div>
                       {{ market[coin.id].usd | usd }}
-                    </span>
+                    </div>
+                    <div
+                      :class="[
+                        'small d-md-none',
+                        { 'text-success': market[coin.id].usd_24h_change >= 0 },
+                        { 'text-danger': market[coin.id].usd_24h_change < 0 }
+                      ]"
+                    >
+                      <b-icon-caret-up-fill
+                        v-if="market[coin.id].usd_24h_change > 0"
+                      />
+                      <b-icon-caret-down-fill
+                        v-if="market[coin.id].usd_24h_change < 0"
+                      />
+                      <span>
+                        {{
+                          Math.abs(market[coin.id].usd_24h_change).toFixed(2)
+                        }}%
+                      </span>
+                    </div>
                   </td>
                   <td
                     :class="[
-                      'py-4 align-middle text-right',
+                      'py-4 align-middle text-right d-none d-md-table-cell',
                       { 'text-success': market[coin.id].usd_24h_change >= 0 },
                       { 'text-danger': market[coin.id].usd_24h_change < 0 }
                     ]"
@@ -85,7 +109,9 @@
                       {{ Math.abs(market[coin.id].usd_24h_change).toFixed(2) }}%
                     </span>
                   </td>
-                  <td class="py-4 align-middle text-right">
+                  <td
+                    class="py-4 align-middle text-right d-none d-md-table-cell"
+                  >
                     <div>
                       <span class="text-muted ml2">
                         {{ coin.symbol.toUpperCase() }}
@@ -113,7 +139,7 @@
                       {{ Math.abs(calcs.pnlUSDChange).toFixed(2) }}%
                     </div>
                   </td>
-                  <td></td>
+                  <!-- <td></td> -->
                 </tr>
               </template>
             </tbody>
