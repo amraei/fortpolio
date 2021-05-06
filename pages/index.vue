@@ -32,7 +32,7 @@
 
           <div class="text-right">
             <div class="text-muted">Capital (approximate):</div>
-            <h4 class="mb-0">{{ capital | usd }}</h4>
+            <h4 class="mb-0">{{ capital.toFixed(2) | usd }}</h4>
           </div>
         </div>
         <div>
@@ -93,7 +93,7 @@
                       {{ coin.total }}
                     </div>
                     <div class="small">
-                      {{ calcs.valueUSD | usd }}
+                      {{ calcs.valueUSD.toFixed(2) | usd }}
                     </div>
                   </td>
                   <td class="py-4 align-middle text-right">
