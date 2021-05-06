@@ -1,12 +1,13 @@
 <template>
   <vue-bootstrap-typeahead
     :data="coins"
-    :serializer="s => s.name"
+    :serializer="s => s.symbol + '' + s.name"
     placeholder="Choose a coin ..."
     @hit="selectedCoin = $event"
   >
-    <template slot="suggestion" slot-scope="{ data, htmlText }">
-      <span v-html="htmlText"></span>&nbsp;
+    <template slot="suggestion" slot-scope="{ data }">
+      <span>{{ data.name }}</span
+      >&nbsp;
       <small class="text-muted">{{ data.symbol.toUpperCase() }}</small>
     </template>
   </vue-bootstrap-typeahead>
