@@ -12,6 +12,7 @@ import {
   BIconCaretUpFill,
   BIconCash,
   BIconEye,
+  BIconGithub,
   BIconPlus
 } from "bootstrap-vue";
 
@@ -21,4 +22,5 @@ Vue.component("BIconCaretUpFill", BIconCaretUpFill);
 Vue.component("BIconCaretDownFill", BIconCaretDownFill);
 Vue.component("BIconCash", BIconCash);
 Vue.component("BIconEye", BIconEye);
+Vue.component("BIconGithub", BIconGithub);
 Vue.component("BIconPlus", BIconPlus);

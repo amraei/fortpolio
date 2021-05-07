@@ -183,13 +183,26 @@
     </div>
 
     <div v-else class="text-center">
-      <h2>You have no funds!</h2>
-      <h6 class="text-muted">Add some funds to setting up your portfolio.</h6>
+      <h1 class="display-1"><span class="text-primary">F</span>ortpolio</h1>
+      <h4>A free and open source portfolio tracker</h4>
+      <h5 class="text-muted">for crypto lovers</h5>
 
-      <button v-b-modal.refuel-modal class="btn btn-primary mt-5">
-        <b-icon-cash class="mr-2" />
-        Add Funds
+      <h6 class="mt-7">Add some funds to setting up your portfolio</h6>
+
+      <button v-b-modal.refuel-modal class="btn btn-primary mt-2">
+        Setup your portfolio
       </button>
+
+      <div class="mt-5">
+        We're on
+        <a
+          href="https://github.com/amraei/fortpolio"
+          target="_blank"
+          class="text-dark"
+        >
+          <b-icon-github /> github.
+        </a>
+      </div>
     </div>
 
     <refuel-modal />
