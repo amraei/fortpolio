@@ -48,12 +48,16 @@ export default {
   ],
 
   router: {
-    base: '/fortpolio/'
+    base: "/fortpolio/"
   },
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {},
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
-  build: {}
+  build: {
+    babel: {
+      plugins: [["@babel/plugin-proposal-private-methods", { loose: true }]]
+    }
+  }
 };
