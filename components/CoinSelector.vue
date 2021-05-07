@@ -1,7 +1,8 @@
 <template>
   <vue-bootstrap-typeahead
+    ref="test"
     :data="coins"
-    :serializer="s => s.symbol + '' + s.name"
+    :serializer="s => s.name + ' ' + s.symbol.toUpperCase()"
     placeholder="Choose a coin ..."
     @hit="selectedCoin = $event"
   >
@@ -24,7 +25,8 @@ export default {
   },
 
   props: {
-    value: Object
+    value: Object,
+    autoFocus: Boolean
   },
 
   data() {
@@ -38,6 +40,10 @@ export default {
     selectedCoin(value) {
       this.$emit("input", value);
     }
+  },
+
+  mounted() {
+    
   }
 };
 </script>

@@ -1,6 +1,7 @@
 export const state = () => ({
   assets: null,
-  funds: null
+  funds: null,
+  watchlist: null
 });
 
 export const mutations = {
@@ -10,5 +11,9 @@ export const mutations = {
   
   setFunds(state, fund) {
     state.funds = fund;
+  },
+
+  setWatchlist(state, watchlist) {
+    state.watchlist = watchlist;
   }
 };

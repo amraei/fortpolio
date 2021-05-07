@@ -26,7 +26,36 @@
         </div>
       </div>
 
-      <div class="rounded border mt-5">
+      <div class="mb-3 mt-5 d-flex align-items-center">
+        <watch-button class="btn-sm" />
+
+        <template v-for="coin in watchlist.list">
+          <span
+            v-if="market[coin.id]"
+            :key="coin.id"
+            class="ml-2 border rounded px-2 py-1 small"
+          >
+            <strong>{{ coin.symbol.toUpperCase() }}</strong>
+            {{ market[coin.id].usd | usd }}
+
+            <span
+              :class="[
+                { 'text-success': market[coin.id].usd_24h_change >= 0 },
+                { 'text-danger': market[coin.id].usd_24h_change < 0 }
+              ]"
+            >
+              <b-icon-caret-up-fill v-if="market[coin.id].usd_24h_change > 0" />
+              <b-icon-caret-down-fill
+                v-if="market[coin.id].usd_24h_change < 0"
+              />
+
+              {{ Math.abs(market[coin.id].usd_24h_change).toFixed(2) }}%
+            </span>
+          </span>
+        </template>
+      </div>
+
+      <div class="rounded border">
         <div
           class="px-2 py-3 d-flex justify-content-between align-items-center"
         >
@@ -173,9 +202,10 @@ import { mapState } from "vuex";
 import coins from "assets/coins";
 import RefuelModal from "@/components/Modals/RefuelModal";
 import TransactionModal from "@/components/Modals/TransactionModal";
+import WatchButton from "~/components/WatchButton.vue";
 
 export default {
-  components: { RefuelModal, TransactionModal },
+  components: { RefuelModal, TransactionModal, WatchButton },
 
   middleware: ["init"],
 
@@ -189,7 +219,7 @@ export default {
   },
 
   computed: {
-    ...mapState(["funds", "assets"]),
+    ...mapState(["funds", "assets", "watchlist"]),
 
     capital() {
       return (
@@ -212,6 +242,15 @@ export default {
 
         if (Object.keys(assets.list).length) this.syncMarket();
       }
+    },
+
+    watchlist: {
+      deep: true,
+      handler(watchlist) {
+        clearTimeout(this.$options.timeout);
+
+        if (Object.keys(watchlist.list).length) this.syncMarket();
+      }
     }
   },
 
@@ -225,11 +264,13 @@ export default {
 
   methods: {
     async syncMarket() {
-      const tokens = Object.keys(this.assets.list);
+      const ids = Object.keys(this.assets.list).concat(
+        Object.keys(this.watchlist.list)
+      );
 
-      if (tokens.length) {
+      if (ids.length) {
         const data = await this.$cgc.simple.price({
-          ids: Object.keys(this.assets.list),
+          ids,
           vs_currencies: ["usd"],
           include_24hr_change: true
         });

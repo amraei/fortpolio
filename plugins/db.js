@@ -99,6 +99,33 @@ export default ({ store }, inject) => {
       this.addFund(-(quantity * price), date);
 
       store.commit("setAssets", assets);
+    },
+
+    async getWatchlist(mutate = false) {
+      let watchlist = null;
+
+      try {
+        watchlist = await db.get("watchlist");
+      } catch (error) {
+        watchlist = { list: {} };
+      }
+
+      if (mutate) store.commit("setWatchlist", watchlist);
+
+      return watchlist;
+    },
+
+    async addWatchlist(coin) {
+      const watchlist = await this.getWatchlist();
+
+      watchlist.list[coin.id] = coin;
+
+      await db.put({
+        ...watchlist,
+        _id: "watchlist"
+      });
+
+      store.commit("setWatchlist", watchlist);
     }
   });
 };
