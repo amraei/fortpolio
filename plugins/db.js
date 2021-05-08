@@ -64,41 +64,53 @@ export default ({ store }, inject) => {
 
       if (!date) date = moment().format("YYYY-MM-DD hh:mm:ss");
 
-      const assets = await this.getAssets();
+      const oldAssets = await this.getAssets();
+      const oldAsset = oldAssets.list[coin.id];
 
-      const newCoin = {
+      const newAsset = {
         id: coin.id,
         symbol: coin.symbol,
         name: coin.name,
-        total: 0,
-        avgPrice: 0,
-        records: !assets.list[coin.id] ? [] : assets.list[coin.id].records
+        total: oldAsset ? oldAsset.total : quantity,
+        avgPrice: oldAsset ? oldAsset.avgPrice : price,
+        records: oldAsset ? oldAsset.records : []
       };
 
-      newCoin.records.push({
+      const newAssetValue = quantity * price;
+
+      let pnl = 0;
+
+      if (newAssetValue < 0 && newAsset.avgPrice > 0) {
+        pnl = quantity * newAsset.avgPrice - newAssetValue;
+      }
+
+      if (oldAsset) {
+        if (quantity > 0) {
+          newAsset.avgPrice =
+            (quantity * price + newAsset.avgPrice * newAsset.total) /
+            (newAsset.total + quantity);
+        }
+
+        newAsset.total += quantity;
+      }
+
+      newAsset.records.push({
         created_at: date,
         quantity,
-        price
+        price,
+        pnl
       });
 
-      newCoin.records.forEach(record => {
-        newCoin.avgPrice =
-          (record.quantity * record.price + newCoin.avgPrice * newCoin.total) /
-          (newCoin.total + record.quantity);
+      this.addFund(-newAssetValue, date);
 
-        newCoin.total += record.quantity;
-      });
-
-      assets.list[coin.id] = newCoin;
+      oldAssets.list[coin.id] = newAsset;
 
       await db.put({
-        ...assets,
+        ...oldAssets,
         _id: "assets"
       });
 
-      this.addFund(-(quantity * price), date);
-
-      store.commit("setAssets", assets);
+      store.commit("setAssets", oldAssets);
     },
 
     async getWatchlist(mutate = false) {

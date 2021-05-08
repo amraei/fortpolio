@@ -16,12 +16,12 @@
         >
           <button v-b-modal.refuel-modal class="btn btn-link mr-3">
             <b-icon-cash class="mr-2" />
-            Manage Funds
+            Funds
           </button>
 
           <button v-b-modal.transaction-modal class="btn btn-primary">
             <b-icon-plus class="mr-2" />
-            Add Asset
+            Add transaction
           </button>
         </div>
       </div>
@@ -86,7 +86,7 @@
             <tbody>
               <template v-for="coin in assets.list">
                 <tr
-                  v-if="market[coin.id]"
+                  v-if="market[coin.id] && coin.total"
                   :key="`coin-${coin.id}`"
                   :set="(calcs = getCalcs(coin.id))"
                 >
