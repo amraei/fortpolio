@@ -71,8 +71,8 @@ export default ({ store }, inject) => {
         id: coin.id,
         symbol: coin.symbol,
         name: coin.name,
-        total: oldAsset ? oldAsset.total : quantity,
-        avgPrice: oldAsset ? oldAsset.avgPrice : price,
+        total: oldAsset && oldAsset.total ? oldAsset.total : quantity,
+        avgPrice: oldAsset && oldAsset.total ? oldAsset.avgPrice : price,
         records: oldAsset ? oldAsset.records : []
       };
 
@@ -84,7 +84,7 @@ export default ({ store }, inject) => {
         pnl = quantity * newAsset.avgPrice - newAssetValue;
       }
 
-      if (oldAsset) {
+      if (oldAsset && oldAsset.total) {
         if (quantity > 0) {
           newAsset.avgPrice =
             (quantity * price + newAsset.avgPrice * newAsset.total) /
