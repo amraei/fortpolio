@@ -70,7 +70,7 @@
         </div>
         <div>
           <table
-            v-if="Object.keys(assets.list).length"
+            v-if="assetList.length"
             class="table table-striped table-hover mb-0"
           >
             <thead>
@@ -84,11 +84,10 @@
               </tr>
             </thead>
             <tbody>
-              <template v-for="coin in assets.list">
+              <template v-for="coin in assetList">
                 <tr
                   v-if="market[coin.id] && coin.total"
                   :key="`coin-${coin.id}`"
-                  :set="(calcs = getCalcs(coin.id))"
                 >
                   <td class="py-4 align-middle">
                     <strong class="d-block d-md-inline">{{ coin.name }}</strong>
@@ -148,24 +147,24 @@
                       {{ coin.total }}
                     </div>
                     <div class="small">
-                      {{ calcs.valueUSD.toFixed(2) | usd }}
+                      {{ coin.valueUSD.toFixed(2) | usd }}
                     </div>
                   </td>
                   <td class="py-4 align-middle text-right">
                     <div>
-                      {{ calcs.pnlUSD > 0 ? "+" : ""
-                      }}{{ calcs.pnlUSD.toFixed(2) | usd }}
+                      {{ coin.pnlUSD > 0 ? "+" : ""
+                      }}{{ coin.pnlUSD.toFixed(2) | usd }}
                     </div>
                     <div
                       :class="[
                         'small',
-                        { 'text-success': calcs.pnlUSDChange >= 0 },
-                        { 'text-danger': calcs.pnlUSDChange < 0 }
+                        { 'text-success': coin.pnlUSDChange >= 0 },
+                        { 'text-danger': coin.pnlUSDChange < 0 }
                       ]"
                     >
-                      <b-icon-caret-up-fill v-if="calcs.pnlUSDChange > 0" />
-                      <b-icon-caret-down-fill v-if="calcs.pnlUSDChange < 0" />
-                      {{ Math.abs(calcs.pnlUSDChange).toFixed(2) }}%
+                      <b-icon-caret-up-fill v-if="coin.pnlUSDChange > 0" />
+                      <b-icon-caret-down-fill v-if="coin.pnlUSDChange < 0" />
+                      {{ Math.abs(coin.pnlUSDChange).toFixed(2) }}%
                     </div>
                   </td>
                   <!-- <td></td> -->
@@ -222,7 +221,7 @@ export default {
 
   middleware: ["init"],
 
-  timeout: null,
+  interval: null,
 
   data() {
     return {
@@ -233,6 +232,32 @@ export default {
 
   computed: {
     ...mapState(["funds", "assets", "watchlist"]),
+
+    assetList() {
+      const list = [];
+
+      for (const key in this.assets.list) {
+        const coin = this.assets.list[key];
+
+        if (this.market[coin.id]) {
+          const orderUSD = coin.total * coin.avgPrice;
+          const valueUSD = coin.total * this.market[coin.id].usd;
+
+          const pnlUSD = valueUSD - orderUSD;
+
+          list.push({
+            ...coin,
+            valueUSD,
+            pnlUSD,
+            pnlUSDChange: (valueUSD / orderUSD - 1) * 100
+          });
+        }
+      }
+
+      return list.sort(function(a, b) {
+        return a.valueUSD > b.valueUSD ? -1 : b.valueUSD > a.valueUSD ? 1 : 0;
+      });
+    },
 
     capital() {
       return (
@@ -247,32 +272,13 @@ export default {
     }
   },
 
-  watch: {
-    assets: {
-      deep: true,
-      handler(assets) {
-        clearTimeout(this.$options.timeout);
-
-        if (Object.keys(assets.list).length) this.syncMarket();
-      }
-    },
-
-    watchlist: {
-      deep: true,
-      handler(watchlist) {
-        clearTimeout(this.$options.timeout);
-
-        if (Object.keys(watchlist.list).length) this.syncMarket();
-      }
-    }
-  },
-
   mounted() {
+    this.$options.interval = setInterval(this.syncMarket, 10000);
     this.syncMarket();
   },
 
   destroyed() {
-    clearTimeout(this.$options.timeout);
+    clearTimeout(this.$options.interval);
   },
 
   methods: {
@@ -289,24 +295,7 @@ export default {
         });
 
         this.market = data.data;
-
-        this.$options.timeout = setTimeout(this.syncMarket, 10000);
       }
-    },
-
-    getCalcs(id) {
-      const coin = this.assets.list[id];
-
-      const orderUSD = coin.total * coin.avgPrice;
-      const valueUSD = coin.total * this.market[coin.id].usd;
-
-      const pnlUSD = valueUSD - orderUSD;
-
-      return {
-        valueUSD,
-        pnlUSD,
-        pnlUSDChange: (valueUSD / orderUSD - 1) * 100
-      };
     }
   }
 };
