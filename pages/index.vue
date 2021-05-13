@@ -119,6 +119,9 @@
                         }}%
                       </span>
                     </div>
+                    <div class="small text-muted">
+                      Avg: {{ coin.avgPrice | usd }}
+                    </div>
                   </td>
                   <td
                     :class="[
