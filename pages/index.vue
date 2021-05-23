@@ -2,10 +2,10 @@
   <div
     :class="[
       'container my-4 flex-grow-1',
-      { 'd-flex flex-column justify-content-center': !funds.records.length }
+      { 'd-flex flex-column justify-content-center': !tokens.length }
     ]"
   >
-    <div v-if="funds.records.length" class="d-flex flex-column">
+    <div v-if="assetList.length" class="d-flex flex-column">
       <div class="row justify-content-between align-items-center">
         <div class="col-md-6">
           <h3 class="mb-0">Your Portfolio</h3>
@@ -14,45 +14,58 @@
         <div
           class="mt-4 mt-md-0 col-md-6 d-flex align-items-center justify-content-md-end"
         >
-          <button v-b-modal.refuel-modal class="btn btn-link mr-3">
-            <b-icon-cash class="mr-2" />
-            Funds
-          </button>
-
           <button v-b-modal.transaction-modal class="btn btn-primary">
             <b-icon-plus class="mr-2" />
             Add transaction
           </button>
+
+          <b-dropdown variant="light" class="ml-2" no-caret right>
+            <template #button-content>
+              <b-icon-three-dots-vertical />
+            </template>
+            <b-dropdown-item-button v-b-modal.purge-modal>
+              <span class="text-danger">
+                <b-icon-trash class="mr-1" />
+                Purge your portfolio
+              </span>
+            </b-dropdown-item-button>
+          </b-dropdown>
         </div>
       </div>
 
-      <div class="mb-3 mt-5 d-flex align-items-center">
+      <div class="mb-3 mt-5 d-flex align-items-start">
         <watch-button class="btn-sm" />
 
-        <template v-for="coin in watchlist.list">
-          <span
-            v-if="market[coin.id]"
-            :key="coin.id"
-            class="ml-2 border rounded px-2 py-1 small"
-          >
-            <strong>{{ coin.symbol.toUpperCase() }}</strong>
-            {{ market[coin.id].usd | usd }}
-
+        <div class="d-flex flex-wrap">
+          <template v-for="coin in watchlist.list">
             <span
-              :class="[
-                { 'text-success': market[coin.id].usd_24h_change >= 0 },
-                { 'text-danger': market[coin.id].usd_24h_change < 0 }
-              ]"
+              v-if="market[coin.id]"
+              :key="coin.id"
+              class="ml-2 mb-2 border rounded px-2 py-1 small"
             >
-              <b-icon-caret-up-fill v-if="market[coin.id].usd_24h_change > 0" />
-              <b-icon-caret-down-fill
-                v-if="market[coin.id].usd_24h_change < 0"
-              />
+              <strong>{{ coin.symbol.toUpperCase() }}</strong>
+              {{ market[coin.id].usd | usd }}
 
-              {{ Math.abs(market[coin.id].usd_24h_change).toFixed(2) }}%
+              <span
+                :class="[
+                  { 'text-success': market[coin.id].usd_24h_change >= 0 },
+                  { 'text-danger': market[coin.id].usd_24h_change < 0 }
+                ]"
+              >
+                <b-icon-caret-up-fill
+                  v-if="market[coin.id].usd_24h_change > 0"
+                />
+                <b-icon-caret-down-fill
+                  v-if="market[coin.id].usd_24h_change < 0"
+                />
+
+                {{ Math.abs(market[coin.id].usd_24h_change).toFixed(2) }}%
+              </span>
+
+              <b-icon-x class="pointer" @click="$db.deleteWatchlist(coin)" />
             </span>
-          </span>
-        </template>
+          </template>
+        </div>
       </div>
 
       <div class="rounded border">
@@ -65,7 +78,18 @@
             <div class="text-muted">
               Capital<span class="d-none d-md-inline"> (approximate)</span>:
             </div>
-            <h4 class="mb-0">{{ capital.toFixed(2) | usd }}</h4>
+            <h4 class="mb-0">{{ capital.total.toFixed(2) | usd }}</h4>
+            <small
+              :class="[
+                { 'text-success': capital.pnlUSD >= 0 },
+                { 'text-danger': capital.pnlUSD < 0 }
+              ]"
+            >
+              <b-icon-caret-up-fill v-if="capital.pnlUSD > 0" />
+              <b-icon-caret-down-fill v-if="capital.pnlUSD < 0" />
+              {{ capital.pnlUSD > 0 ? "+" : "" }}
+              {{ capital.pnlUSD.toFixed(2) | usd }}
+            </small>
           </div>
         </div>
         <div>
@@ -155,8 +179,8 @@
                   </td>
                   <td class="py-4 align-middle text-right">
                     <div>
-                      {{ coin.pnlUSD > 0 ? "+" : ""
-                      }}{{ coin.pnlUSD.toFixed(2) | usd }}
+                      {{ coin.pnlUSD > 0 ? "+" : "" }}
+                      {{ coin.pnlUSD.toFixed(2) | usd }}
                     </div>
                     <div
                       :class="[
@@ -167,7 +191,12 @@
                     >
                       <b-icon-caret-up-fill v-if="coin.pnlUSDChange > 0" />
                       <b-icon-caret-down-fill v-if="coin.pnlUSDChange < 0" />
-                      {{ Math.abs(coin.pnlUSDChange).toFixed(2) }}%
+
+                      {{
+                        isFinite(coin.pnlUSDChange)
+                          ? Math.abs(coin.pnlUSDChange).toFixed(2) + "%"
+                          : "&infin;"
+                      }}
                     </div>
                   </td>
                   <!-- <td></td> -->
@@ -178,7 +207,7 @@
 
           <div v-else class="text-center py-5 rounded">
             <h4>Your portfolio is empty!</h4>
-            <p class="text-muted">Please add some transactions.</p>
+            <p class="text-muted">Add your some transactions.</p>
           </div>
         </div>
       </div>
@@ -186,13 +215,16 @@
 
     <div v-else class="text-center">
       <h1 class="display-1"><span class="text-primary">F</span>ortpolio</h1>
-      <h4>A free and open source portfolio tracker</h4>
+      <h4>Free, open source & privacy-first portfolio tracker</h4>
       <h5 class="text-muted">for crypto lovers</h5>
 
-      <h6 class="mt-7">Add some funds to setting up your portfolio</h6>
+      <h6 class="mt-7">
+        Add a transaction to setting up your portfolio.<br />
+        <small class="text-muted">(All data are stored on your browser.)</small>
+      </h6>
 
-      <button v-b-modal.refuel-modal class="btn btn-primary mt-2">
-        Setup your portfolio
+      <button v-b-modal.transaction-modal class="btn btn-primary mt-2">
+        Add a transaction
       </button>
 
       <div class="mt-5">
@@ -207,7 +239,19 @@
       </div>
     </div>
 
-    <refuel-modal />
+    <b-modal
+      id="purge-modal"
+      title="Purge your portfolio"
+      header-text-variant="white"
+      header-bg-variant="danger"
+      ok-variant="danger"
+      ok-title="Purge it"
+      @ok="$db.purge()"
+    >
+      Are you sure to purge all data in your portfolio? It <b>CANNOT</b> be
+      undone and everthing will be deleted permanently.
+    </b-modal>
+
     <transaction-modal />
   </div>
 </template>
@@ -215,12 +259,11 @@
 <script>
 import { mapState } from "vuex";
 import coins from "assets/coins";
-import RefuelModal from "@/components/Modals/RefuelModal";
 import TransactionModal from "@/components/Modals/TransactionModal";
 import WatchButton from "~/components/WatchButton.vue";
 
 export default {
-  components: { RefuelModal, TransactionModal, WatchButton },
+  components: { TransactionModal, WatchButton },
 
   middleware: ["init"],
 
@@ -234,7 +277,13 @@ export default {
   },
 
   computed: {
-    ...mapState(["funds", "assets", "watchlist"]),
+    ...mapState(["assets", "watchlist"]),
+
+    tokens() {
+      return Object.keys(this.assets.list).concat(
+        Object.keys(this.watchlist.list)
+      );
+    },
 
     assetList() {
       const list = [];
@@ -263,15 +312,25 @@ export default {
     },
 
     capital() {
-      return (
-        this.funds.amount +
-        Object.values(this.assets.list).reduce((total, asset) => {
-          if (this.market[asset.id])
-            return total + asset.total * this.market[asset.id].usd;
+      // this.funds.amount +
+      return Object.values(this.assetList).reduce(
+        (capital, asset) => {
+          capital.total += asset.valueUSD;
+          capital.pnlUSD += asset.pnlUSD;
 
-          return total;
-        }, 0)
+          return capital;
+        },
+        {
+          total: 0,
+          pnlUSD: 0
+        }
       );
+    }
+  },
+
+  watch: {
+    tokens() {
+      this.syncMarket();
     }
   },
 
@@ -286,13 +345,9 @@ export default {
 
   methods: {
     async syncMarket() {
-      const ids = Object.keys(this.assets.list).concat(
-        Object.keys(this.watchlist.list)
-      );
-
-      if (ids.length) {
+      if (this.tokens.length) {
         const data = await this.$cgc.simple.price({
-          ids,
+          ids: this.tokens,
           vs_currencies: ["usd"],
           include_24hr_change: true
         });
@@ -303,3 +358,9 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.pointer {
+  cursor: pointer;
+}
+</style>

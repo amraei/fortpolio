@@ -13,7 +13,10 @@ import {
   BIconCash,
   BIconEye,
   BIconGithub,
-  BIconPlus
+  BIconPlus,
+  BIconThreeDotsVertical,
+  BIconTrash,
+  BIconX
 } from "bootstrap-vue";
 
 Vue.component("BIconArrowLeftShort", BIconArrowLeftShort);
@@ -24,3 +27,6 @@ Vue.component("BIconCash", BIconCash);
 Vue.component("BIconEye", BIconEye);
 Vue.component("BIconGithub", BIconGithub);
 Vue.component("BIconPlus", BIconPlus);
+Vue.component("BIconThreeDotsVertical", BIconThreeDotsVertical);
+Vue.component("BIconTrash", BIconTrash);
+Vue.component("BIconX", BIconX);

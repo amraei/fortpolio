@@ -17,6 +17,7 @@
     "bootstrap-vue": "^2.21.2",
     "coingecko-api": "^1.0.10",
     "core-js": "^3.9.1",
+    "lodash": "^4.17.21",
     "moment": "^2.29.1",
     "nuxt": "^2.15.3",
     "pouchdb-browser": "^7.2.2",

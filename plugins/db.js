@@ -1,5 +1,6 @@
 import moment from "moment";
 import PouchDB from "pouchdb-browser";
+import omit from "lodash/omit";
 
 export default ({ store }, inject) => {
   const db = new PouchDB("fortpolio");
@@ -138,6 +139,37 @@ export default ({ store }, inject) => {
       });
 
       store.commit("setWatchlist", watchlist);
+    },
+
+    async deleteWatchlist(coin) {
+      const watchlist = await this.getWatchlist();
+
+      watchlist.list = omit(watchlist.list, [coin.id]);
+
+      await db.put({
+        ...watchlist,
+        _id: "watchlist"
+      });
+
+      store.commit("setWatchlist", watchlist);
+    },
+
+    async purge() {
+      const empty = { list: {} };
+
+      const assets = await this.getAssets();
+      const watchlist = await this.getWatchlist();
+
+      try {
+        await db.remove(assets);
+      } catch (error) {}
+
+      try {
+        await db.remove(watchlist);
+      } catch (error) {}
+
+      store.commit("setAssets", empty);
+      store.commit("setWatchlist", empty);
     }
   });
 };

@@ -9,6 +9,7 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 import {
   BCalendar,
   BDropdown,
+  BDropdownItemButton,
   BFormRadioGroup,
   BModal,
   BTime,
@@ -17,6 +18,7 @@ import {
 
 Vue.component("BCalendar", BCalendar);
 Vue.component("BDropdown", BDropdown);
+Vue.component("BDropdownItemButton", BDropdownItemButton);
 Vue.component("BFormRadioGroup", BFormRadioGroup);
 Vue.component("BModal", BModal);
 Vue.component("BTime", BTime);
