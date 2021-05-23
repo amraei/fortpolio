@@ -6,45 +6,6 @@ export default ({ store }, inject) => {
   const db = new PouchDB("fortpolio");
 
   inject("db", {
-    async getFunds(mutate = false) {
-      let funds = null;
-
-      try {
-        funds = await db.get("funds");
-      } catch (error) {
-        funds = {
-          amount: 0,
-          records: []
-        };
-      }
-
-      if (mutate) store.commit("setFunds", funds);
-
-      return funds;
-    },
-
-    async addFund(amount, date) {
-      amount = parseFloat(amount);
-
-      if (!date) date = moment().format("YYYY-MM-DD hh:mm:ss");
-
-      const funds = await this.getFunds();
-
-      funds.records.push({
-        created_at: date,
-        amount
-      });
-
-      funds.amount += amount;
-
-      await db.put({
-        ...funds,
-        _id: "funds"
-      });
-
-      store.commit("setFunds", funds);
-    },
-
     async getAssets(mutate = false) {
       let assets = null;
 
@@ -59,59 +20,67 @@ export default ({ store }, inject) => {
       return assets;
     },
 
-    async addTrans(coin, quantity, price, date) {
+    async addTrans({ id, symbol, name }, quantity, price, fee, date) {
       quantity = parseFloat(quantity);
       price = parseFloat(price);
 
-      if (!date) date = moment().format("YYYY-MM-DD hh:mm:ss");
+      const feePrice = Math.abs((quantity * price * fee) / 100);
 
-      const oldAssets = await this.getAssets();
-      const oldAsset = oldAssets.list[coin.id];
+      const allAssets = await this.getAssets();
+      const oldAsset = allAssets.list[id];
 
-      const newAsset = {
-        id: coin.id,
-        symbol: coin.symbol,
-        name: coin.name,
-        total: oldAsset && oldAsset.total ? oldAsset.total : quantity,
-        avgPrice: oldAsset && oldAsset.total ? oldAsset.avgPrice : price,
-        records: oldAsset ? oldAsset.records : []
+      const asset = {
+        id,
+        symbol,
+        name,
+        total: 0,
+        avgPrice: 0,
+        records: [],
+        ...(oldAsset && oldAsset.total ? oldAsset : {})
       };
-
-      const newAssetValue = quantity * price;
 
       let pnl = 0;
 
-      if (newAssetValue < 0 && newAsset.avgPrice > 0) {
-        pnl = quantity * newAsset.avgPrice - newAssetValue;
+      // It's a buy order
+      if (quantity > 0) {
+        quantity *= 1 - fee / 100;
+
+        pnl = -feePrice;
       }
 
-      if (oldAsset && oldAsset.total) {
-        if (quantity > 0) {
-          newAsset.avgPrice =
-            (quantity * price + newAsset.avgPrice * newAsset.total) /
-            (newAsset.total + quantity);
-        }
+      const transValue = Math.abs(quantity * price);
 
-        newAsset.total += quantity;
+      // It's a sell order
+      if (quantity < 0) {
+        pnl = transValue - Math.abs(quantity * asset.avgPrice);
+
+        if (fee > 0) pnl -= feePrice;
       }
 
-      newAsset.records.push({
-        created_at: date,
+      if (quantity > 0) {
+        asset.avgPrice =
+          (transValue + asset.avgPrice * asset.total) /
+          (asset.total + quantity);
+      }
+
+      asset.total += quantity;
+
+      asset.records.push({
         quantity,
         price,
-        pnl
+        fee: feePrice,
+        pnl,
+        created_at: date ? date : moment().format("YYYY-MM-DD hh:mm:ss")
       });
 
-      this.addFund(-newAssetValue, date);
-
-      oldAssets.list[coin.id] = newAsset;
+      allAssets.list[id] = asset;
 
       await db.put({
-        ...oldAssets,
+        ...allAssets,
         _id: "assets"
       });
 
-      store.commit("setAssets", oldAssets);
+      store.commit("setAssets", allAssets);
     },
 
     async getWatchlist(mutate = false) {

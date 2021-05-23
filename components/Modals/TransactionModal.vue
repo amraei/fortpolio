@@ -48,15 +48,25 @@
           >
             <strong>
               <b-icon-calendar class="mr-1" />
-              {{ $moment(datetime).format("MMMM DD, YYYY, hh:mm A") }}
+              {{ $moment(datetime).format("MMMM DD; YYYY, hh:mm A") }}
             </strong>
           </button>
+
+          <b-dropdown variant="light" toggle-class="btn-sm" class="d-inline">
+            <template #button-content>
+              <strong> Fee: {{ fee }}%</strong>
+            </template>
+            <b-dropdown-item-button
+              v-for="(p, i) in [0.1, 0.2, 0.3, 0.4, 0.5]"
+              :key="i"
+              @click="fee = p"
+            >
+              {{ p }}%
+            </b-dropdown-item-button>
+          </b-dropdown>
         </div>
 
-        <button
-          type="submit"
-          class="btn btn-primary btn-block mt-5"
-        >
+        <button type="submit" class="btn btn-primary btn-block mt-5">
           Add transaction
         </button>
       </form>
@@ -98,7 +108,8 @@ export default {
       price: null,
       datetime: null,
       selectedDate: null,
-      selectedTime: null
+      selectedTime: null,
+      fee: 0.1
     };
   },
 
@@ -110,7 +121,7 @@ export default {
     add() {
       const quantity = this.quantity * (this.type === "buy" ? 1 : -1);
 
-      this.$db.addTrans(this.coin, quantity, this.price, this.datetime);
+      this.$db.addTrans(this.coin, quantity, this.price, this.fee, this.datetime);
       this.$bvModal.hide("transaction-modal");
     },
 
