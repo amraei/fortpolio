@@ -104,7 +104,7 @@
                 <th class="text-right d-none d-md-table-cell">24hr Change</th>
                 <th class="text-right d-none d-md-table-cell">Holdings</th>
                 <th class="text-right">Profit/Loss</th>
-                <!-- <th></th> -->
+                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -199,7 +199,14 @@
                       }}
                     </div>
                   </td>
-                  <!-- <td></td> -->
+                  <td class="py-4 align-middle">
+                    <button
+                      class="btn btn-link text-danger btn-sm"
+                      @click="$db.deleteAsset(coin)"
+                    >
+                      <b-icon-trash />
+                    </button>
+                  </td>
                 </tr>
               </template>
             </tbody>

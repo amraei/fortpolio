@@ -20,6 +20,18 @@ export default ({ store }, inject) => {
       return assets;
     },
 
+    async deleteAsset({ id }) {
+      const allAssets = await this.getAssets();
+      allAssets.list = omit(allAssets.list, id);
+
+      await db.put({
+        ...allAssets,
+        _id: "assets"
+      });
+
+      store.commit("setAssets", allAssets);
+    },
+
     async addTrans({ id, symbol, name }, quantity, price, fee, date) {
       quantity = parseFloat(quantity);
       price = parseFloat(price);
