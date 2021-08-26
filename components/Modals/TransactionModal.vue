@@ -57,7 +57,7 @@
               <strong> Fee: {{ fee }}%</strong>
             </template>
             <b-dropdown-item-button
-              v-for="(p, i) in [0.1, 0.2, 0.3, 0.4, 0.5]"
+              v-for="(p, i) in [0, 0.1, 0.2, 0.3, 0.4, 0.5]"
               :key="i"
               @click="fee = p"
             >
