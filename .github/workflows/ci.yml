@@ -22,11 +22,15 @@ jobs:
     steps:
       - name: Checkout 🛎
         uses: actions/checkout@master
+        
+      - name: Build
+        run: |
+          npm i
+          npm run build
 
-      - name: Deploy with gh-pages
+      - name: Deploy
         run: |
           git remote set-url origin https://git:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
-          npm run build
           npm run deploy -- -u "github-actions-bot <support+actions@github.com>"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
