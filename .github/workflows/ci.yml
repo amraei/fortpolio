@@ -23,23 +23,10 @@ jobs:
       - name: Checkout 🛎
         uses: actions/checkout@master
 
-      - name: Setup node env 🏗
-        uses: actions/setup-node@v2.1.2
-        with:
-          node-version: ${{ matrix.node }}
-          check-latest: true
-
-      - name: Cache node_modules 📦
-        uses: actions/cache@v2
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
-      - name: Install dependencies 👨🏻‍💻
-        run: npm ci
-
-      - name: Run linter 👀
-        run: npm run lint
-
+      - name: Deploy with gh-pages
+        run: |
+          git remote set-url origin https://git:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
+          npm run build
+          npm run deploy -- -u "github-actions-bot <support+actions@github.com>"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
