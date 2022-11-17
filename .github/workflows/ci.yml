@@ -41,8 +41,8 @@ jobs:
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
         run: npm i
         
-      - name: Build
-        run: npm run build
+      - name: Generate
+        run: npm run generate
 
       - name: Deploy
         run: |
