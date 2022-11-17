@@ -1,41 +1,6 @@
 // https://api.coingecko.com/api/v3/coins/list?include_platform=true
 
 export default [
-  { id: "01coin", symbol: "zoc", name: "01coin" },
-  {
-    id: "0-5x-long-algorand-token",
-    symbol: "algohalf",
-    name: "0.5X Long Algorand Token"
-  },
-  {
-    id: "0-5x-long-altcoin-index-token",
-    symbol: "althalf",
-    name: "0.5X Long Altcoin Index Token"
-  },
-  {
-    id: "0-5x-long-balancer-token",
-    symbol: "balhalf",
-    name: "0.5X Long Balancer Token"
-  },
-  {
-    id: "0-5x-long-bitcoin-cash-token",
-    symbol: "bchhalf",
-    name: "0.5X Long Bitcoin Cash Token"
-  },
-  {
-    id: "0-5x-long-bitcoin-sv-token",
-    symbol: "bsvhalf",
-    name: "0.5X Long Bitcoin SV Token"
-  },
-  {
-    id: "0-5x-long-bitcoin-token",
-    symbol: "half",
-    name: "0.5X Long Bitcoin Token"
-  },
-  {
-    id: "0-5x-long-cardano-token",
-    symbol: "adahalf",
-[
   {
     "id": "01coin",
     "symbol": "zoc",
