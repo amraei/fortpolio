@@ -16,10 +16,10 @@
     "@nuxtjs/yandex-metrika": "^1.3.0",
     "bootstrap-vue": "^2.21.2",
     "coingecko-api": "^1.0.10",
-    "core-js": "^3.9.1",
+    "core-js": "^3.18.0",
     "lodash": "^4.17.21",
     "moment": "^2.29.1",
-    "nuxt": "^2.15.3",
+    "nuxt": "^2.15.8",
     "pouchdb-browser": "^7.2.2",
     "vue-bootstrap-typeahead": "^0.2.6"
   },
@@ -31,7 +31,7 @@
     "eslint-plugin-nuxt": "^2.0.0",
     "eslint-plugin-vue": "^7.7.0",
     "gh-pages": "^3.1.0",
-    "node-sass": "^4.14.1",
-    "sass-loader": "^8.0.2"
+    "sass": "~1.32.13",
+    "sass-loader": "^10.2.0"
   }
 }
