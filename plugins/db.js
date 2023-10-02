@@ -49,6 +49,8 @@ export default ({ store }, inject) => {
         assets = { list: {} };
       }
 
+      assets = reCalcAvgs(assets);
+
       if (mutate) store.commit("setAssets", assets);
 
       return assets;
@@ -67,8 +69,8 @@ export default ({ store }, inject) => {
     },
 
     async addTrans({ id, symbol, name }, quantity, price, fee, date) {
-      quantity = parseFloat(quantity);
-      price = parseFloat(price);
+      quantity = notNaN(parseFloat(quantity));
+      price = notNaN(parseFloat(price));
 
       const feePrice = Math.abs((quantity * price * fee) / 100);
 
@@ -177,11 +179,11 @@ export default ({ store }, inject) => {
 
       try {
         await db.remove(assets);
-      } catch (error) {}
+      } catch (error) { }
 
       try {
         await db.remove(watchlist);
-      } catch (error) {}
+      } catch (error) { }
 
       store.commit("setAssets", empty);
       store.commit("setWatchlist", empty);
