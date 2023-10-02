@@ -1,6 +1,40 @@
 import moment from "moment";
 import PouchDB from "pouchdb-browser";
 import omit from "lodash/omit";
+import forIn from "lodash/forIn";
+
+const notNaN = v => isNaN(v) ? 0 : v
+
+const reCalcAvgs = (assets) => {
+  forIn(assets.list, (asset, key) => {
+    asset.total = 0;
+    asset.avgPrice = 0;
+
+    asset.records = asset.records.map((record, i) => {
+      record = {
+        ...record,
+        fee: notNaN(record.fee),
+        pnl: notNaN(record.pnl),
+        price: notNaN(record.price)
+      }
+
+      if (record.quantity > 0) {
+        const transValue = Math.abs(record.quantity * record.price);
+        asset.avgPrice =
+          (transValue + asset.avgPrice * asset.total) /
+          (asset.total + record.quantity);
+      }
+
+      asset.total += record.quantity;
+
+      return record;
+    })
+
+    assets.list[key] = asset
+  })
+
+  return assets;
+}
 
 export default ({ store }, inject) => {
   const db = new PouchDB("fortpolio");

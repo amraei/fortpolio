@@ -310,16 +310,23 @@ export default {
         const coin = this.assets.list[key];
 
         if (this.market[coin.id]) {
-          const orderUSD = coin.total * coin.avgPrice;
-          const valueUSD = coin.total * this.market[coin.id].usd;
+          const orderUSD = coin.total * this.notNaN(coin.avgPrice);
 
-          const pnlUSD = valueUSD - orderUSD;
+          let valueUSD = 0;
+          let pnlUSD = 0;
+          let pnlUSDChange = 0;
+
+          if (this.market[coin.id].usd) {
+            valueUSD = coin.total * this.market[coin.id].usd;
+            pnlUSD = valueUSD - orderUSD;
+            pnlUSDChange = (valueUSD / orderUSD - 1) * 100;
+          }
 
           list.push({
             ...coin,
             valueUSD,
             pnlUSD,
-            pnlUSDChange: (valueUSD / orderUSD - 1) * 100
+            pnlUSDChange
           });
         }
       }
@@ -372,6 +379,11 @@ export default {
 
         this.market = data.data;
       }
+    },
+
+    notNaN(value) {
+      return isNaN(value) ? 0 : value;
+    },
     }
   }
 };
