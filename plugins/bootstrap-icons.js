@@ -8,6 +8,7 @@ import Vue from "vue";
 import {
   BIconArrowLeftShort,
   BIconCalendar,
+  BIconCardChecklist,
   BIconCaretDownFill,
   BIconCaretUpFill,
   BIconCash,
@@ -21,6 +22,7 @@ import {
 
 Vue.component("BIconArrowLeftShort", BIconArrowLeftShort);
 Vue.component("BIconCalendar", BIconCalendar);
+Vue.component("BIconCardChecklist", BIconCardChecklist);
 Vue.component("BIconCaretUpFill", BIconCaretUpFill);
 Vue.component("BIconCaretDownFill", BIconCaretDownFill);
 Vue.component("BIconCash", BIconCash);

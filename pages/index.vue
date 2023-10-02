@@ -78,7 +78,7 @@
             <div class="text-muted">
               Capital<span class="d-none d-md-inline"> (approximate)</span>:
             </div>
-            <h4 class="mb-0">{{ capital.total.toFixed(2) | usd }}</h4>
+            <h4 class="mb-0">{{ capital.total | usd }}</h4>
             <small
               :class="[
                 { 'text-success': capital.pnlUSD >= 0 },
@@ -88,7 +88,7 @@
               <b-icon-caret-up-fill v-if="capital.pnlUSD > 0" />
               <b-icon-caret-down-fill v-if="capital.pnlUSD < 0" />
               {{ capital.pnlUSD > 0 ? "+" : "" }}
-              {{ capital.pnlUSD.toFixed(2) | usd }}
+              {{ capital.pnlUSD | usd }}
             </small>
           </div>
         </div>
@@ -104,7 +104,7 @@
                 <th class="text-right d-none d-md-table-cell">24hr Change</th>
                 <th class="text-right d-none d-md-table-cell">Holdings</th>
                 <th class="text-right">Profit/Loss</th>
-                <th></th>
+                <th style="width: 0px"></th>
               </tr>
             </thead>
             <tbody>
@@ -115,14 +115,15 @@
                 >
                   <td class="py-4 align-middle">
                     <strong class="d-block d-md-inline">{{ coin.name }}</strong>
-                    <small class="text-muted d-block d-md-inline">
+                    <!-- <small class="text-muted d-block d-md-inline">
                       {{ coin.symbol.toUpperCase() }}
-                    </small>
+                    </small> -->
                     <small class="d-block d-md-none">{{ coin.total }}</small>
                   </td>
+
                   <td class="py-4 align-middle text-right">
                     <div>
-                      {{ market[coin.id].usd | usd }}
+                      {{ market[coin.id].usd ?? "-" | usd }}
                     </div>
                     <div
                       :class="[
@@ -147,7 +148,9 @@
                       Avg: {{ coin.avgPrice | usd }}
                     </div>
                   </td>
+
                   <td
+                    v-if="market[coin.id].usd"
                     :class="[
                       'py-4 align-middle text-right d-none d-md-table-cell',
                       { 'text-success': market[coin.id].usd_24h_change >= 0 },
@@ -165,22 +168,30 @@
                     </span>
                   </td>
                   <td
+                    v-else
+                    class="py-4 align-middle text-center d-none d-md-table-cell"
+                  >
+                    ∞
+                  </td>
+
+                  <td
                     class="py-4 align-middle text-right d-none d-md-table-cell"
                   >
                     <div>
-                      <span class="text-muted ml2">
+                      <span class="text-muted ml-2">
                         {{ coin.symbol.toUpperCase() }}
                       </span>
-                      {{ coin.total }}
+                      {{ coin.total | fnum }}
                     </div>
                     <div class="small">
-                      {{ coin.valueUSD.toFixed(2) | usd }}
+                      {{ coin.valueUSD | usd }}
                     </div>
                   </td>
+
                   <td class="py-4 align-middle text-right">
                     <div>
                       {{ coin.pnlUSD > 0 ? "+" : "" }}
-                      {{ coin.pnlUSD.toFixed(2) | usd }}
+                      {{ coin.pnlUSD | usd }}
                     </div>
                     <div
                       :class="[
